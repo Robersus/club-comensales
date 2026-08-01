@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Club de Comensales · Registro</title>
+<meta name="description" content="Únete a nuestro club de comensales: promociones exclusivas, novedades y una sorpresa el día de tu cumpleaños.">
+<meta name="theme-color" content="#08070a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Club de Comensales · Registro">
+<meta property="og:description" content="Promociones exclusivas, novedades y una sorpresa el día de tu cumpleaños.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9b26a' stroke-width='1.6'%3E%3Cpath d='M6 3v7a3 3 0 0 0 6 0V3M9 10v11M18 3c-1.5 1.5-2 3.5-2 6s.5 3 2 3v9'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CONFIGURACIÓN VISUAL — cambia estos valores a tu marca
+   ============================================================ */
+:root{
+  --gold:#d9b26a;
+  --gold-soft:#f0d9a6;
+  --gold-deep:#a8813c;
+  --bg-0:#08070a;
+  --bg-1:#100d12;
+  --ink:#f6f1e7;
+  --ink-mute:#9d9490;
+  --ink-faint:#6b635f;
+  --line:rgba(217,178,106,.18);
+  --line-soft:rgba(255,255,255,.07);
+  --surface:rgba(255,255,255,.035);
+  --danger:#e06a5a;
+  --ok:#7fc9a0;
+  --r:18px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg-0);
+  color:var(--ink);
+  min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 18px;
+  overflow-x:hidden;
+  position:relative;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Fondo ambiental ---------- */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  opacity:.05;mix-blend-mode:overlay;
+}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+.b1{width:60vw;height:60vw;max-width:620px;max-height:620px;background:radial-gradient(circle,#6b4d1f,transparent 68%);top:-18%;left:-14%;animation:drift1 22s var(--ease) infinite alternate}
+.b2{width:52vw;height:52vw;max-width:520px;max-height:520px;background:radial-gradient(circle,#3a1f47,transparent 68%);bottom:-20%;right:-12%;animation:drift2 26s var(--ease) infinite alternate}
+.b3{width:38vw;height:38vw;max-width:380px;max-height:380px;background:radial-gradient(circle,#1f3a44,transparent 70%);top:45%;left:55%;animation:drift1 30s var(--ease) infinite alternate-reverse}
+@keyframes drift1{to{transform:translate3d(8%,10%,0) scale(1.15)}}
+@keyframes drift2{to{transform:translate3d(-9%,-8%,0) scale(1.2)}}
+
+/* ---------- Tarjeta ---------- */
+.card{
+  position:relative;z-index:1;
+  width:100%;max-width:520px;
+  background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  border:1px solid var(--line-soft);
+  border-radius:28px;
+  padding:38px 34px 32px;
+  backdrop-filter:blur(28px) saturate(140%);
+  -webkit-backdrop-filter:blur(28px) saturate(140%);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.09);
+  animation:rise .9s var(--ease) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.985)}}
+
+/* ---------- Encabezado ---------- */
+.brand{text-align:center;margin-bottom:26px}
+.crest{
+  width:54px;height:54px;margin:0 auto 14px;
+  border:1px solid var(--line);border-radius:50%;
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 30%,rgba(217,178,106,.16),transparent 70%);
+  animation:glow 4s ease-in-out infinite;
+}
+@keyframes glow{50%{box-shadow:0 0 26px -4px rgba(217,178,106,.35)}}
+.crest svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.3}
+.brand h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(27px,7vw,34px);font-weight:400;letter-spacing:.01em;line-height:1.15;
+  background:linear-gradient(100deg,var(--gold-soft),var(--gold) 45%,var(--gold-deep));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.brand .kicker{
+  font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:9px;font-weight:500;
+}
+.brand p{color:var(--ink-mute);font-size:13.5px;margin-top:10px;line-height:1.6;font-weight:300}
+
+/* ---------- Progreso ---------- */
+.progress{display:flex;align-items:center;gap:7px;margin:0 0 28px}
+.pstep{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.pstep i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold-deep),var(--gold-soft));
+  transition:width .55s var(--ease)}
+.pstep.done i,.pstep.active i{width:100%}
+.pstep.active i{width:100%;animation:fill .5s var(--ease) both}
+@keyframes fill{from{width:0}}
+
+/* ---------- Pasos ---------- */
+.step{display:none;animation:slideIn .5s var(--ease) both}
+.step.on{display:block}
+@keyframes slideIn{from{opacity:0;transform:translateX(18px)}}
+.step-label{
+  font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--gold-deep);margin-bottom:20px;font-weight:600;display:flex;
+  align-items:center;gap:9px
+}
+.step-label::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ---------- Campos ---------- */
+.field{position:relative;margin-bottom:17px}
+.field label{
+  position:absolute;left:16px;top:16px;
+  font-size:14px;color:var(--ink-faint);pointer-events:none;
+  transition:all .28s var(--ease);font-weight:300;
+}
+.field input,.field textarea,.field select{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--line-soft);
+  border-radius:var(--r);
+  padding:22px 16px 9px;
+  color:var(--ink);
+  font-family:inherit;font-size:15px;font-weight:400;
+  outline:none;
+  transition:border-color .25s,background .25s,box-shadow .25s;
+}
+.field textarea{min-height:104px;resize:none;padding-top:26px;line-height:1.55}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:rgba(217,178,106,.5);
+  background:rgba(255,255,255,.055);
+  box-shadow:0 0 0 4px rgba(217,178,106,.08);
+}
+.field input:focus+label,.field input:not(:placeholder-shown)+label,
+.field textarea:focus+label,.field textarea:not(:placeholder-shown)+label{
+  top:8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+}
+.field.bad input,.field.bad textarea,.field.bad select,.field.bad .phone-wrap{border-color:rgba(224,106,90,.6)}
+.err{
+  display:block;font-size:11.5px;color:var(--danger);
+  margin:6px 0 0 4px;height:0;opacity:0;overflow:hidden;transition:.25s var(--ease)
+}
+.field.bad .err{height:16px;opacity:1}
+.hint{font-size:11.5px;color:var(--ink-faint);margin:7px 0 0 4px;font-weight:300}
+
+/* ---------- Teléfono ---------- */
+.phone-wrap{
+  display:flex;align-items:stretch;
+  background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);
+  transition:border-color .25s,background .25s,box-shadow .25s;overflow:hidden;
+}
+.phone-wrap:focus-within{border-color:rgba(217,178,106,.5);background:rgba(255,255,255,.055);box-shadow:0 0 0 4px rgba(217,178,106,.08)}
+.phone-wrap select{
+  border:0;background:transparent;border-radius:0;width:auto;flex:0 0 auto;
+  padding:20px 8px 20px 15px;font-size:14px;color:var(--ink-mute);
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+}
+.phone-wrap select option{background:#161219;color:var(--ink)}
+.phone-wrap .sep{width:1px;background:var(--line-soft);margin:13px 0}
+.phone-wrap input{border:0;background:transparent;border-radius:0;flex:1;padding:20px 16px 20px 12px;box-shadow:none!important}
+.phone-wrap input:focus{background:transparent;box-shadow:none}
+
+/* ---------- Cumpleaños ---------- */
+.bday{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:9px}
+.sel{position:relative}
+.sel::after{
+  content:'';position:absolute;right:14px;top:50%;width:6px;height:6px;
+  border-right:1.4px solid var(--ink-faint);border-bottom:1.4px solid var(--ink-faint);
+  transform:translateY(-70%) rotate(45deg);pointer-events:none
+}
+.sel select{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  padding:22px 30px 9px 15px;font-size:14.5px;
+}
+.sel select option{background:#161219;color:var(--ink)}
+.sel span.cap{
+  position:absolute;left:15px;top:8px;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);pointer-events:none;transition:color .25s
+}
+.sel select:focus~span.cap{color:var(--gold)}
+
+/* ---------- Chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.chip{
+  border:1px solid var(--line-soft);background:var(--surface);
+  color:var(--ink-mute);border-radius:99px;padding:10px 16px;
+  font-size:13px;font-family:inherit;cursor:pointer;font-weight:400;
+  transition:all .25s var(--ease);
+}
+.chip:hover{border-color:rgba(217,178,106,.35);color:var(--ink)}
+.chip[aria-pressed="true"]{
+  border-color:rgba(217,178,106,.6);color:#1a1409;
+  background:linear-gradient(100deg,var(--gold-soft),var(--gold));
+  font-weight:500;box-shadow:0 6px 20px -8px rgba(217,178,106,.6)
+}
+
+/* ---------- Botones ---------- */
+.actions{display:flex;gap:10px;margin-top:26px;align-items:center}
+button.btn{
+  font-family:inherit;font-size:14.5px;font-weight:500;cursor:pointer;
+  border-radius:99px;padding:15px 26px;border:1px solid transparent;
+  transition:all .28s var(--ease);position:relative;overflow:hidden;
+}
+.btn-primary{
+  flex:1;color:#181203;
+  background:linear-gradient(100deg,var(--gold-soft),var(--gold) 55%,var(--gold-deep));
+  box-shadow:0 12px 30px -12px rgba(217,178,106,.65);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 40px -12px rgba(217,178,106,.8)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary[disabled]{opacity:.55;cursor:wait;transform:none}
+.btn-ghost{
+  background:transparent;border-color:var(--line-soft);color:var(--ink-mute);
+  padding:15px 20px;
+}
+.btn-ghost:hover{border-color:var(--line);color:var(--ink)}
+.spin{
+  width:15px;height:15px;border:2px solid rgba(24,18,3,.25);border-top-color:#181203;
+  border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:8px;
+  animation:sp .7s linear infinite
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- Éxito ---------- */
+.done{display:none;text-align:center;padding:14px 0 6px}
+.done.on{display:block;animation:slideIn .6s var(--ease) both}
+.check{width:76px;height:76px;margin:0 auto 22px}
+.check circle,.check path{fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.check circle{stroke-dasharray:207;stroke-dashoffset:207;animation:draw 1s var(--ease) .1s forwards}
+.check path{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s var(--ease) .8s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.done h2{font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:400;color:var(--gold-soft);margin-bottom:12px}
+.done p{color:var(--ink-mute);font-size:14px;line-height:1.7;font-weight:300;max-width:340px;margin:0 auto}
+.done .again{
+  margin-top:26px;background:none;border:1px solid var(--line-soft);color:var(--ink-mute);
+  border-radius:99px;padding:12px 24px;font-family:inherit;font-size:13px;cursor:pointer;transition:.25s
+}
+.done .again:hover{border-color:var(--line);color:var(--ink)}
+
+/* ---------- Aviso de error de envío ---------- */
+.alert{
+  display:none;margin-top:16px;padding:13px 15px;border-radius:14px;
+  background:rgba(224,106,90,.09);border:1px solid rgba(224,106,90,.28);
+  color:#f0a99d;font-size:12.5px;line-height:1.55
+}
+.alert.on{display:block;animation:slideIn .35s var(--ease) both}
+
+.foot{
+  text-align:center;margin-top:24px;padding-top:18px;border-top:1px solid var(--line-soft);
+  font-size:10.5px;color:var(--ink-faint);letter-spacing:.16em;text-transform:uppercase;font-weight:400
+}
+
+@media (max-width:420px){
+  .card{padding:30px 22px 26px;border-radius:24px}
+  .bday{grid-template-columns:1fr 1.4fr .9fr;gap:7px}
+  .chip{padding:9px 14px;font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<main class="card">
+
+  <div class="brand">
+    <div class="crest">
+      <svg viewBox="0 0 24 24"><path d="M6 3v7a3 3 0 0 0 6 0V3M9 10v11M18 3c-1.5 1.5-2 3.5-2 6s.5 3 2 3v9"/></svg>
+    </div>
+    <div class="kicker" id="kicker">Club de Comensales</div>
+    <h1 id="titulo">Sabor &amp; Casa</h1>
+    <p id="subtitulo">Déjanos tus datos y te consentimos: promociones, novedades y una sorpresa el día de tu cumpleaños.</p>
+  </div>
+
+  <div class="progress" id="progress">
+    <div class="pstep active"><i></i></div>
+    <div class="pstep"><i></i></div>
+    <div class="pstep"><i></i></div>
+  </div>
+
+  <form id="form" novalidate>
+
+    <!-- PASO 1 -->
+    <section class="step on" data-step="0">
+      <div class="step-label">Paso 1 · Quién eres</div>
+
+      <div class="field" id="f-nombre">
+        <input type="text" id="nombre" name="nombre" placeholder=" " autocomplete="name" maxlength="60">
+        <label for="nombre">Nombre completo</label>
+        <span class="err">Escribe tu nombre (mínimo 2 letras).</span>
+      </div>
+
+      <div class="field" id="f-telefono">
+        <div class="phone-wrap">
+          <select id="lada" aria-label="Código de país">
+            <option value="+52" selected>🇲🇽 +52</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+34">🇪🇸 +34</option>
+            <option value="+57">🇨🇴 +57</option>
+            <option value="+54">🇦🇷 +54</option>
+            <option value="+56">🇨🇱 +56</option>
+            <option value="+51">🇵🇪 +51</option>
+            <option value="+593">🇪🇨 +593</option>
+            <option value="+502">🇬🇹 +502</option>
+            <option value="+506">🇨🇷 +506</option>
+          </select>
+          <div class="sep"></div>
+          <input type="tel" id="telefono" placeholder="55 1234 5678" inputmode="tel" autocomplete="tel" maxlength="18">
+        </div>
+        <span class="err">Necesitamos un número válido (10 dígitos).</span>
+        <div class="hint">Por aquí te llegarán las promos por WhatsApp.</div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" data-next>Continuar</button>
+      </div>
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="step" data-step="1">
+      <div class="step-label">Paso 2 · Para consentirte</div>
+
+      <div class="field" id="f-cumple">
+        <div class="bday">
+          <div class="sel">
+            <select id="dia"><option value="">—</option></select>
+            <span class="cap">Día</span>
+          </div>
+          <div class="sel">
+            <select id="mes"><option value="">—</option></select>
+            <span class="cap">Mes</span>
+          </div>
+          <div class="sel">
+            <select id="anio"><option value="">—</option></select>
+            <span class="cap">Año</span>
+          </div>
+        </div>
+        <span class="err">Elige al menos el día y el mes de tu cumpleaños.</span>
+        <div class="hint">El año es opcional. Te enviaremos un detalle ese día.</div>
+      </div>
+
+      <div class="field" id="f-email">
+        <input type="email" id="email" placeholder=" " autocomplete="email" maxlength="80">
+        <label for="email">Correo electrónico</label>
+        <span class="err">Revisa tu correo, parece incompleto.</span>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-prev>Atrás</button>
+        <button type="button" class="btn btn-primary" data-next>Continuar</button>
+      </div>
+    </section>
+
+    <!-- PASO 3 -->
+    <section class="step" data-step="2">
+      <div class="step-label">Paso 3 · Cuéntanos</div>
+
+      <div class="field" id="f-canal">
+        <div class="hint" style="margin:0 0 11px 2px;font-size:12.5px;color:var(--ink-mute)">¿Cómo nos conociste?</div>
+        <div class="chips" id="chips">
+          <button type="button" class="chip" aria-pressed="false">Redes sociales</button>
+          <button type="button" class="chip" aria-pressed="false">Me recomendaron</button>
+          <button type="button" class="chip" aria-pressed="false">Iba pasando</button>
+          <button type="button" class="chip" aria-pressed="false">Google / Maps</button>
+          <button type="button" class="chip" aria-pressed="false">Influencer o blog</button>
+          <button type="button" class="chip" aria-pressed="false">Ya soy cliente</button>
+        </div>
+        <span class="err" style="margin-top:8px">Selecciona una opción.</span>
+      </div>
+
+      <div class="field" id="f-sugerencias" style="margin-top:20px">
+        <textarea id="sugerencias" placeholder=" " maxlength="600"></textarea>
+        <label for="sugerencias">Sugerencias o comentarios</label>
+        <div class="hint"><span id="cuenta">0</span>/600 · Lo leemos todo, de verdad.</div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-prev>Atrás</button>
+        <button type="submit" class="btn btn-primary" id="enviar">Unirme al club</button>
+      </div>
+
+      <div class="alert" id="alerta"></div>
+    </section>
+  </form>
+
+  <!-- ÉXITO -->
+  <div class="done" id="done">
+    <svg class="check" viewBox="0 0 76 76">
+      <circle cx="38" cy="38" r="33"/>
+      <path d="M24 39.5l10 10 19-21"/>
+    </svg>
+    <h2 id="doneTitulo">¡Bienvenido al club!</h2>
+    <p id="doneTexto">Ya eres parte de la familia. Te escribiremos por WhatsApp con promociones y algo especial el día de tu cumpleaños.</p>
+    <button class="again" id="otro">Registrar a otra persona</button>
+  </div>
+
+  <div class="foot" id="footer">Tus datos están seguros · Nunca los compartimos</div>
+</main>
+
+<script>
+/* =============================================================
+   CONFIGURACIÓN — edita SOLO este bloque
+   ============================================================= */
+const CONFIG = {
+  // 1) URL del nodo Webhook de n8n.
+  //
+  //    ⚠️ La de abajo es la URL de PRUEBA (/webhook-test/). Solo recibe datos
+  //    mientras tienes el workflow abierto en n8n con "Listen for test event"
+  //    activado, y únicamente una vez por cada clic.
+  //
+  //    Cuando actives el workflow (botón "Active" en n8n), cambia
+  //    "/webhook-test/" por "/webhook/" en la línea de abajo:
+  //    https://solutionsmx.app.n8n.cloud/webhook/d526620b-88e9-4efb-a0cf-e1f74ce1b2ec
+  //
+  WEBHOOK_URL: "https://solutionsmx.app.n8n.cloud/webhook-test/d526620b-88e9-4efb-a0cf-e1f74ce1b2ec",
+
+  // 2) Identidad del restaurante
+  RESTAURANTE:  "Sabor & Casa",
+  KICKER:       "Club de Comensales",
+  SUBTITULO:    "Déjanos tus datos y te consentimos: promociones, novedades y una sorpresa el día de tu cumpleaños.",
+  SUCURSAL:     "Matriz",           // útil si usas el mismo form en varias sucursales
+  PIE:          "Tus datos están seguros · Nunca los compartimos",
+
+  // 3) Mensajes de la pantalla final
+  EXITO_TITULO: "¡Bienvenido al club!",
+  EXITO_TEXTO:  "Ya eres parte de la familia. Te escribiremos por WhatsApp con promociones y algo especial el día de tu cumpleaños.",
+
+  // 4) Si true, cuando WEBHOOK_URL esté vacío el form simula el envío
+  //    y muestra el JSON en la consola (modo demo).
+  MODO_DEMO: true
+};
+/* ============================================================= */
+
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---- Aplicar configuración ---- */
+$('#titulo').textContent    = CONFIG.RESTAURANTE;
+$('#kicker').textContent    = CONFIG.KICKER;
+$('#subtitulo').textContent = CONFIG.SUBTITULO;
+$('#footer').textContent    = CONFIG.PIE;
+$('#doneTitulo').textContent = CONFIG.EXITO_TITULO;
+$('#doneTexto').textContent  = CONFIG.EXITO_TEXTO;
+document.title = CONFIG.RESTAURANTE + ' · Registro';
+
+/* ---- Poblar selects de cumpleaños ---- */
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const dia = $('#dia'), mes = $('#mes'), anio = $('#anio');
+for (let d = 1; d <= 31; d++) dia.insertAdjacentHTML('beforeend', `<option value="${d}">${d}</option>`);
+MESES.forEach((m, i) => mes.insertAdjacentHTML('beforeend', `<option value="${i+1}">${m}</option>`));
+const ahora = new Date().getFullYear();
+for (let y = ahora - 15; y >= ahora - 95; y--) anio.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`);
+
+/* Ajusta los días disponibles según el mes elegido */
+const DIAS_MES = [31,29,31,30,31,30,31,31,30,31,30,31];
+mes.addEventListener('change', () => {
+  const max = mes.value ? DIAS_MES[mes.value - 1] : 31;
+  const actual = dia.value;
+  dia.innerHTML = '<option value="">—</option>';
+  for (let d = 1; d <= max; d++) dia.insertAdjacentHTML('beforeend', `<option value="${d}">${d}</option>`);
+  if (actual && actual <= max) dia.value = actual;
+});
+
+/* ---- Contador de caracteres ---- */
+$('#sugerencias').addEventListener('input', e => $('#cuenta').textContent = e.target.value.length);
+
+/* ---- Chips (selección única) ---- */
+let canal = '';
+$('#chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  const ya = chip.getAttribute('aria-pressed') === 'true';
+  $$('#chips .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+  chip.setAttribute('aria-pressed', ya ? 'false' : 'true');
+  canal = ya ? '' : chip.textContent.trim();
+  if (canal) marcar('#f-canal', false);
+});
+
+/* ---- Validación ---- */
+const marcar = (sel, mal) => $(sel).classList.toggle('bad', mal);
+
+const soloDigitos = s => (s || '').replace(/\D/g, '');
+
+const validaciones = {
+  nombre(){
+    const v = $('#nombre').value.trim();
+    const ok = v.length >= 2 && /[a-záéíóúñü]/i.test(v);
+    marcar('#f-nombre', !ok); return ok;
+  },
+  telefono(){
+    const n = soloDigitos($('#telefono').value);
+    const ok = n.length >= 8 && n.length <= 15;
+    marcar('#f-telefono', !ok); return ok;
+  },
+  cumple(){
+    const ok = !!(dia.value && mes.value);
+    marcar('#f-cumple', !ok); return ok;
+  },
+  email(){
+    const v = $('#email').value.trim();
+    const ok = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v);
+    marcar('#f-email', !ok); return ok;
+  },
+  canal(){
+    const ok = !!canal;
+    marcar('#f-canal', !ok); return ok;
+  }
+};
+
+const CAMPOS_POR_PASO = [['nombre','telefono'], ['cumple','email'], ['canal']];
+
+function validarPaso(i){
+  return CAMPOS_POR_PASO[i].map(k => validaciones[k]()).every(Boolean);
+}
+
+/* Limpiar el error al corregir */
+['nombre','telefono','email'].forEach(id => {
+  $('#' + id).addEventListener('input', () => {
+    const mapa = { nombre:'#f-nombre', telefono:'#f-telefono', email:'#f-email' };
+    if ($(mapa[id]).classList.contains('bad')) validaciones[id]();
+  });
+});
+[dia, mes].forEach(s => s.addEventListener('change', () => {
+  if ($('#f-cumple').classList.contains('bad')) validaciones.cumple();
+}));
+
+/* ---- Navegación entre pasos ---- */
+let paso = 0;
+const pasos = $$('.step');
+const barras = $$('.pstep');
+
+function ir(n){
+  pasos[paso].classList.remove('on');
+  paso = n;
+  pasos[paso].classList.add('on');
+  barras.forEach((b, i) => {
+    b.classList.toggle('done', i < paso);
+    b.classList.toggle('active', i === paso);
+  });
+  $('.card').scrollIntoView({ behavior:'smooth', block:'start' });
+  const primero = pasos[paso].querySelector('input,select,textarea');
+  if (primero && window.innerWidth > 700) setTimeout(() => primero.focus(), 320);
+}
+
+$$('[data-next]').forEach(b => b.addEventListener('click', () => {
+  if (validarPaso(paso)) ir(paso + 1);
+}));
+$$('[data-prev]').forEach(b => b.addEventListener('click', () => ir(paso - 1)));
+
+/* Enter avanza (excepto en el textarea) */
+$('#form').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    if (paso < 2) { if (validarPaso(paso)) ir(paso + 1); }
+    else $('#form').requestSubmit();
+  }
+});
+
+/* ---- Construcción del payload ---- */
+function armarPayload(){
+  const lada = $('#lada').value;
+  const local = soloDigitos($('#telefono').value);
+  const e164 = lada + local;                    // formato internacional para WhatsApp
+  const d = dia.value, m = mes.value, y = anio.value;
+  const pad = n => String(n).padStart(2, '0');
+
+  return {
+    nombre:            $('#nombre').value.trim(),
+    telefono:          e164,                                  // +5255...  ← usar en WhatsApp
+    telefono_wa:       e164.replace('+', ''),                 // 5255...   ← formato Cloud API
+    telefono_local:    local,
+    lada:              lada,
+    email:             $('#email').value.trim().toLowerCase(),
+    cumple_dia:        Number(d),
+    cumple_mes:        Number(m),
+    cumple_anio:       y ? Number(y) : null,
+    cumple_mmdd:       `${pad(m)}-${pad(d)}`,                 // para comparar cada día en n8n
+    cumple_texto:      `${d} de ${MESES[m-1]}${y ? ' de ' + y : ''}`,
+    como_nos_conocio:  canal,
+    sugerencias:       $('#sugerencias').value.trim(),
+    restaurante:       CONFIG.RESTAURANTE,
+    sucursal:          CONFIG.SUCURSAL,
+    fecha_registro:    new Date().toISOString(),
+    origen:            'formulario_web'
+  };
+}
+
+/* ---- Envío ---- */
+const form = $('#form'), btn = $('#enviar'), alerta = $('#alerta');
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!validarPaso(2)) return;
+
+  alerta.classList.remove('on');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Enviando…';
+
+  const datos = armarPayload();
+
+  try {
+    if (!CONFIG.WEBHOOK_URL) {
+      if (!CONFIG.MODO_DEMO) throw new Error('Falta configurar WEBHOOK_URL');
+      console.log('%c[MODO DEMO] Esto se enviaría a n8n:', 'color:#d9b26a;font-weight:bold');
+      console.log(JSON.stringify(datos, null, 2));
+      await new Promise(r => setTimeout(r, 900));
+    } else {
+      await enviar(datos);
+    }
+    exito();
+  } catch (err) {
+    console.error(err);
+    alerta.textContent = 'No pudimos enviar tu registro. Revisa tu conexión e inténtalo otra vez.';
+    alerta.classList.add('on');
+    btn.disabled = false;
+    btn.textContent = 'Reintentar';
+  }
+});
+
+async function enviar(datos){
+  // Intento 1: POST JSON normal (n8n debe permitir CORS para tu dominio)
+  try {
+    const r = await fetch(CONFIG.WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    // Sí hubo respuesta del servidor: confiamos en el código HTTP.
+    if (!r.ok) throw new Error('El webhook respondió ' + r.status);
+    return true;
+  } catch (err) {
+    // Si el servidor respondió con error, NO reintentamos: el problema
+    // está en n8n (workflow inactivo, URL mal, etc.).
+    if (/respondió/.test(err.message)) throw err;
+
+    // Aquí solo llegamos si el navegador bloqueó la petición (CORS) o no hubo red.
+    // Intento 2: envío "simple", sin preflight. No podemos leer la respuesta,
+    // pero el webhook sí recibe los datos aunque falte configurar CORS en n8n.
+    await fetch(CONFIG.WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(datos)
+    });
+    return true;
+  }
+}
+
+function exito(){
+  form.style.display = 'none';
+  $('#progress').style.display = 'none';
+  $('#done').classList.add('on');
+}
+
+/* ---- Reiniciar ---- */
+$('#otro').addEventListener('click', () => {
+  form.reset();
+  canal = '';
+  $$('#chips .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+  $$('.field').forEach(f => f.classList.remove('bad'));
+  $('#cuenta').textContent = '0';
+  alerta.classList.remove('on');
+  btn.disabled = false;
+  btn.textContent = 'Unirme al club';
+  $('#done').classList.remove('on');
+  form.style.display = '';
+  $('#progress').style.display = '';
+  ir(0);
+});
+</script>
+</body>
+</html>
