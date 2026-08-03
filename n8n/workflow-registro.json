@@ -1,0 +1,74 @@
+{
+  "name": "Club de Comensales — Registro",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "512fe979-a918-4a99-86f0-54f32222cecb",
+        "responseMode": "onReceived",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "Registro del formulario",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "512fe979-a918-4a99-86f0-54f32222cecb",
+      "notes": "Recibe el POST JSON del formulario. Cambia allowedOrigins '*' por tu dominio real cuando lo publiques."
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Aplanar datos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0],
+      "notes": "Saca los campos de $json.body al primer nivel para que Google Sheets pueda mapearlos automaticamente."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [],
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Guardar en Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 0],
+      "notes": "Elige tu hoja en documentId y sheetName. Los encabezados deben llamarse igual que los campos del payload."
+    }
+  ],
+  "connections": {
+    "Registro del formulario": {
+      "main": [[{ "node": "Aplanar datos", "type": "main", "index": 0 }]]
+    },
+    "Aplanar datos": {
+      "main": [[{ "node": "Guardar en Sheets", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

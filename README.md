@@ -36,6 +36,9 @@ viaja en el payload y puedes filtrar por él en n8n o en la hoja.
 
 ## Montar el workflow en n8n
 
+En [`n8n/`](n8n/) hay dos workflows listos para importar (registro y
+cumpleaños) con su guía de configuración. Si prefieres armarlos a mano:
+
 **Nodo 1 — Webhook**
 
 - HTTP Method: `POST`
