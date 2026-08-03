@@ -384,26 +384,21 @@ button.btn{
    CONFIGURACIÓN — edita SOLO este bloque
    ============================================================= */
 const CONFIG = {
-  // 1) URL del nodo Webhook de n8n (flujo principal: WhatsApp / lo que ya tenías).
+  // 1) Conexión con n8n
   //
-  //    ⚠️ La de abajo es la URL de PRUEBA (/webhook-test/). Solo recibe datos
-  //    mientras tienes el workflow abierto en n8n con "Listen for test event"
-  //    activado, y únicamente una vez por cada clic.
+  //    Solo hace falta UN webhook. n8n recibe el registro una vez y desde
+  //    ahí lo reparte: WhatsApp por un lado, Google Sheets por el otro.
+  //    Así no hay dos URLs que mantener ni registros que se guarden a medias.
   //
-  //    Cuando actives el workflow (botón "Active" en n8n), cambia
-  //    "/webhook-test/" por "/webhook/" en la línea de abajo:
-  //    https://solutionsmx.app.n8n.cloud/webhook/d526620b-88e9-4efb-a0cf-e1f74ce1b2ec
+  N8N_BASE:   "https://solutionsmx.app.n8n.cloud",
+  WEBHOOK_ID: "d526620b-88e9-4efb-a0cf-e1f74ce1b2ec",
+  //    MODO_PRUEBA: true  → usa /webhook-test/  (workflow abierto en n8n con
+  //                         "Listen for test event"; solo 1 envío por clic)
+  //    MODO_PRUEBA: false → usa /webhook/       (workflow en "Active")
   //
-  WEBHOOK_URL: "https://solutionsmx.app.n8n.cloud/webhook-test/d526620b-88e9-4efb-a0cf-e1f74ce1b2ec",
-  // 1b) URL del nodo Webhook de n8n que escribe en Google Sheets.
+  //    Es lo ÚNICO que hay que cambiar para pasar a producción.
   //
-  //    Se envía como una petición GET independiente, con los datos del
-  //    registro como parámetros en la URL (?nombre=...&email=...).
-  //
-  //    ⚠️ También es la URL de PRUEBA (/webhook-test/). Cuando actives ese
-  //    workflow en n8n, cambia "/webhook-test/" por "/webhook/" aquí abajo.
-  //
-  SHEETS_WEBHOOK_URL: "https://solutionsmx.app.n8n.cloud/webhook-test/7040d386-7628-4bb3-b6f3-05c7c298e407",
+  MODO_PRUEBA: true,
   // 2) Identidad del restaurante
   RESTAURANTE:  "Sabor & Casa",
   KICKER:       "Club de Comensales",
@@ -413,11 +408,18 @@ const CONFIG = {
   // 3) Mensajes de la pantalla final
   EXITO_TITULO: "¡Bienvenido al club!",
   EXITO_TEXTO:  "Ya eres parte de la familia. Te escribiremos por WhatsApp con promociones y algo especial el día de tu cumpleaños.",
-  // 4) Si true, cuando WEBHOOK_URL esté vacío el form simula el envío
+  // 4) Si true, cuando no haya webhook configurado el form simula el envío
   //    y muestra el JSON en la consola (modo demo).
   MODO_DEMO: true
 };
 /* ============================================================= */
+/* URL final del webhook, armada a partir de CONFIG. */
+const WEBHOOK_URL = (CONFIG.N8N_BASE && CONFIG.WEBHOOK_ID)
+  ? `${CONFIG.N8N_BASE.replace(/\/+$/, '')}/${CONFIG.MODO_PRUEBA ? 'webhook-test' : 'webhook'}/${CONFIG.WEBHOOK_ID}`
+  : '';
+/* Si n8n no contesta en este tiempo, cortamos y avisamos al comensal
+   en vez de dejar el botón girando para siempre. */
+const TIMEOUT_MS = 15000;
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 /* ---- Aplicar configuración ---- */
@@ -564,17 +566,14 @@ form.addEventListener('submit', async e => {
   btn.innerHTML = '<span class="spin"></span>Enviando…';
   const datos = armarPayload();
   try {
-    if (!CONFIG.WEBHOOK_URL) {
-      if (!CONFIG.MODO_DEMO) throw new Error('Falta configurar WEBHOOK_URL');
+    if (!WEBHOOK_URL) {
+      if (!CONFIG.MODO_DEMO) throw new Error('Falta configurar N8N_BASE y WEBHOOK_ID');
       console.log('%c[MODO DEMO] Esto se enviaría a n8n:', 'color:#d9b26a;font-weight:bold');
       console.log(JSON.stringify(datos, null, 2));
       await new Promise(r => setTimeout(r, 900));
     } else {
       await enviar(datos);
     }
-    // El envío a Google Sheets es "best effort": si falla, no bloqueamos
-    // el flujo principal ni mostramos error al comensal.
-    enviarASheets(datos);
     exito();
   } catch (err) {
     console.error(err);
@@ -584,46 +583,44 @@ form.addEventListener('submit', async e => {
     btn.textContent = 'Reintentar';
   }
 });
+/* Corta la petición si n8n no responde a tiempo. */
+const conTimeout = () => AbortSignal.timeout ? AbortSignal.timeout(TIMEOUT_MS) : undefined;
+const esTimeout  = err => err.name === 'TimeoutError' || err.name === 'AbortError';
 async function enviar(datos){
-  // Intento 1: POST JSON normal (n8n debe permitir CORS para tu dominio)
+  const cuerpo = JSON.stringify(datos);
+  // Intento 1: POST JSON normal. Requiere que el nodo Webhook de n8n tenga
+  // tu dominio en "Allowed Origins (CORS)". Es el camino bueno: podemos leer
+  // la respuesta y sabemos de verdad si el registro se guardó.
   try {
-    const r = await fetch(CONFIG.WEBHOOK_URL, {
+    const r = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datos)
+      body: cuerpo,
+      signal: conTimeout()
     });
     // Sí hubo respuesta del servidor: confiamos en el código HTTP.
     if (!r.ok) throw new Error('El webhook respondió ' + r.status);
     return true;
   } catch (err) {
-    // Si el servidor respondió con error, NO reintentamos: el problema
-    // está en n8n (workflow inactivo, URL mal, etc.).
+    // El servidor contestó con error → NO reintentamos: el problema está en
+    // n8n (workflow inactivo, URL mal, algún nodo roto).
     if (/respondió/.test(err.message)) throw err;
+    // Tampoco reintentamos si simplemente no contestó a tiempo.
+    if (esTimeout(err)) throw new Error('n8n tardó demasiado en responder');
     // Aquí solo llegamos si el navegador bloqueó la petición (CORS) o no hubo red.
-    // Intento 2: envío "simple", sin preflight. No podemos leer la respuesta,
-    // pero el webhook sí recibe los datos aunque falte configurar CORS en n8n.
-    await fetch(CONFIG.WEBHOOK_URL, {
+    // Intento 2: envío "simple", sin preflight. El webhook recibe los datos
+    // aunque falte configurar CORS, pero OJO: no podemos leer la respuesta,
+    // así que un fallo de n8n se le mostraría al comensal como éxito.
+    // Configura CORS en n8n para que este camino no llegue a usarse.
+    await fetch(WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify(datos)
+      body: cuerpo,
+      signal: conTimeout()
     });
     return true;
   }
-}
-/* ---- Envío a Google Sheets vía n8n (GET con los datos en la URL) ---- */
-function enviarASheets(datos){
-  if (!CONFIG.SHEETS_WEBHOOK_URL) return;
-  const params = new URLSearchParams();
-  Object.entries(datos).forEach(([k, v]) => {
-    if (v !== null && v !== undefined) params.set(k, v);
-  });
-  const url = CONFIG.SHEETS_WEBHOOK_URL + '?' + params.toString();
-  // GET simple en modo no-cors: no necesitamos leer la respuesta, solo que
-  // el webhook de n8n reciba la petición y escriba la fila en Sheets.
-  fetch(url, { method: 'GET', mode: 'no-cors' }).catch(err => {
-    console.error('No se pudo enviar a Google Sheets:', err);
-  });
 }
 function exito(){
   form.style.display = 'none';
