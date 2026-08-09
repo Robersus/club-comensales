@@ -379,11 +379,18 @@ button.btn{
   </div>
   <div class="foot" id="footer">Tus datos están seguros · Nunca los compartimos</div>
 </main>
-<script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 /* =============================================================
    CONFIGURACIÓN — edita SOLO este bloque
    ============================================================= */
 const CONFIG = {
+  // 0) Supabase: base de datos donde se guardan los registros.
+  //    La clave "publishable" (sb_publishable_...) es segura para usarse
+  //    en el navegador: la tabla tiene Row Level Security y solo permite
+  //    INSERT desde el cliente, nunca lectura/edición/borrado.
+  SUPABASE_URL: "https://kpynjnelzzrmihxilwcj.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_mLhxwFvhA9Y34ZZTSACOug_-hhejR3F",
   // 1) URL del nodo Webhook de n8n (flujo principal: WhatsApp / lo que ya tenías).
   //
   //    ⚠️ La de abajo es la URL de PRUEBA (/webhook-test/). Solo recibe datos
@@ -394,16 +401,9 @@ const CONFIG = {
   //    "/webhook-test/" por "/webhook/" en la línea de abajo:
   //    https://solutionsmx.app.n8n.cloud/webhook/cee7e5cb-4220-4f46-b171-2b8a7a37b2ee
   //
+  //    Este webhook ahora solo dispara el aviso de WhatsApp: los datos del
+  //    registro se guardan en Supabase (ver arriba), no aquí.
   WEBHOOK_URL: "https://solutionsmx.app.n8n.cloud/webhook-test/cee7e5cb-4220-4f46-b171-2b8a7a37b2ee",
-  // 1b) URL del nodo Webhook de n8n que escribe en Google Sheets.
-  //
-  //    Se envía como una petición GET independiente, con los datos del
-  //    registro como parámetros en la URL (?nombre=...&email=...).
-  //
-  //    ⚠️ También es la URL de PRUEBA (/webhook-test/). Cuando actives ese
-  //    workflow en n8n, cambia "/webhook-test/" por "/webhook/" aquí abajo.
-  //
-  SHEETS_WEBHOOK_URL: "https://solutionsmx.app.n8n.cloud/webhook-test/7040d386-7628-4bb3-b6f3-05c7c298e407",
   // 2) Identidad del restaurante
   RESTAURANTE:  "Sabor & Casa",
   KICKER:       "Club de Comensales",
@@ -413,13 +413,16 @@ const CONFIG = {
   // 3) Mensajes de la pantalla final
   EXITO_TITULO: "¡Bienvenido al club!",
   EXITO_TEXTO:  "Ya eres parte de la familia. Te escribiremos por WhatsApp con promociones y algo especial el día de tu cumpleaños.",
-  // 4) Si true, cuando WEBHOOK_URL esté vacío el form simula el envío
-  //    y muestra el JSON en la consola (modo demo).
+  // 4) Si true, cuando SUPABASE_URL/SUPABASE_ANON_KEY estén vacíos el form
+  //    simula el guardado y muestra el JSON en la consola (modo demo).
   MODO_DEMO: true
 };
 /* ============================================================= */
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
+const supabase = CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY
+  ? createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
+  : null;
 /* ---- Aplicar configuración ---- */
 $('#titulo').textContent    = CONFIG.RESTAURANTE;
 $('#kicker').textContent    = CONFIG.KICKER;
@@ -564,17 +567,18 @@ form.addEventListener('submit', async e => {
   btn.innerHTML = '<span class="spin"></span>Enviando…';
   const datos = armarPayload();
   try {
-    if (!CONFIG.WEBHOOK_URL) {
-      if (!CONFIG.MODO_DEMO) throw new Error('Falta configurar WEBHOOK_URL');
-      console.log('%c[MODO DEMO] Esto se enviaría a n8n:', 'color:#d9b26a;font-weight:bold');
+    if (!supabase) {
+      if (!CONFIG.MODO_DEMO) throw new Error('Falta configurar SUPABASE_URL / SUPABASE_ANON_KEY');
+      console.log('%c[MODO DEMO] Esto se guardaría en Supabase:', 'color:#d9b26a;font-weight:bold');
       console.log(JSON.stringify(datos, null, 2));
       await new Promise(r => setTimeout(r, 900));
     } else {
-      await enviar(datos);
+      await guardarEnSupabase(datos);
     }
-    // El envío a Google Sheets es "best effort": si falla, no bloqueamos
-    // el flujo principal ni mostramos error al comensal.
-    enviarASheets(datos);
+    // El aviso de WhatsApp por n8n es "best effort": si falla, el registro
+    // ya quedó guardado en Supabase, así que no bloqueamos ni mostramos
+    // error al comensal.
+    if (CONFIG.WEBHOOK_URL) enviar(datos).catch(err => console.error('No se pudo avisar a n8n:', err));
     exito();
   } catch (err) {
     console.error(err);
@@ -611,19 +615,26 @@ async function enviar(datos){
     return true;
   }
 }
-/* ---- Envío a Google Sheets vía n8n (GET con los datos en la URL) ---- */
-function enviarASheets(datos){
-  if (!CONFIG.SHEETS_WEBHOOK_URL) return;
-  const params = new URLSearchParams();
-  Object.entries(datos).forEach(([k, v]) => {
-    if (v !== null && v !== undefined) params.set(k, v);
+/* ---- Guardar el registro en Supabase ---- */
+async function guardarEnSupabase(datos){
+  const { error } = await supabase.from('registros_club').insert({
+    nombre:           datos.nombre,
+    telefono:         datos.telefono,
+    telefono_wa:      datos.telefono_wa,
+    telefono_local:   datos.telefono_local,
+    lada:             datos.lada,
+    email:            datos.email,
+    cumple_dia:       datos.cumple_dia,
+    cumple_mes:       datos.cumple_mes,
+    cumple_anio:      datos.cumple_anio,
+    cumple_mmdd:      datos.cumple_mmdd,
+    como_nos_conocio: datos.como_nos_conocio,
+    sugerencias:      datos.sugerencias,
+    restaurante:      datos.restaurante,
+    sucursal:         datos.sucursal,
+    origen:           datos.origen
   });
-  const url = CONFIG.SHEETS_WEBHOOK_URL + '?' + params.toString();
-  // GET simple en modo no-cors: no necesitamos leer la respuesta, solo que
-  // el webhook de n8n reciba la petición y escriba la fila en Sheets.
-  fetch(url, { method: 'GET', mode: 'no-cors' }).catch(err => {
-    console.error('No se pudo enviar a Google Sheets:', err);
-  });
+  if (error) throw error;
 }
 function exito(){
   form.style.display = 'none';
